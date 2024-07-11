@@ -1,6 +1,11 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useContext, useState } from "react";
+
+
+
 export default function EditProduct() {
+
+    const params = useParams()
 
     const [validationErrors, setValidationErrors] = useState({})
 
@@ -13,7 +18,7 @@ const formData = new FormData(event.target)
 const product = Object.fromEntries(formData.entries())
 
 if (!product.name || !product.brand || !product.category || !product.price
-    || !product.description || !product.image.name) {
+    || !product.description ) {
 
     alert("Please fill all the fields!")
     return
@@ -57,7 +62,7 @@ catch (error) {
 ID
 </label>
 <div className="col-sm-8">
-<input className="form-control" name="name"/>
+<input readOnly className="form-control-plaintext" defaultValue={params.id} />
 
 
 </div>
@@ -115,10 +120,28 @@ Name
                         </div>
 
                         <div className="row mb-3">
+                            
+                            <div className="offset-sm-4 col-sm-8">
+                                <img src={"http://localhost:4000/images/" + "22866337.jpg"}
+                                    width="150" alt="..."
+                                />
+                                
+                            </div>
+                            </div>
+
+                        <div className="row mb-3">
                             <label className="col-sm-4 col-form-label">Image</label>
                             <div className="col-sm-8">
                                 <input className="form-control" type="file" name="image" />
                                 <span className="text-danger">{validationErrors.image}</span>
+                            </div>
+                        </div>
+
+                        <div className="row mb-3">
+                            <label className="col-sm-4 col-form-label">Created At</label>
+                            <div className="col-sm-8">
+                                <input readOnly className="form-control-plaintext" defaultValue={"2024-07-10"}  />
+                                
                             </div>
                         </div>
 
