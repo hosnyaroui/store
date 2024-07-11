@@ -1,15 +1,34 @@
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 
 
 export default function EditProduct() {
 
     const params = useParams()
-
+    const [initialData, setInitialData] = useState()
     const [validationErrors, setValidationErrors] = useState({})
 
     const navigate = useNavigate()
+
+    function getProduct() {
+        fetch("http://localhost:4000/products/" + params.id)
+            .then(response => {
+                if (response.ok) {
+                    return response.json()
+                }
+
+                throw new Error()
+            })
+            .then(data => {
+                setInitialData(data)
+            })
+            .catch(error => {
+                alert("Unable to read the product details")
+            })
+    }
+
+    useEffect(getProduct, [])
 
 async    function handleSubmit(event) {
 event.preventDefault()
@@ -25,7 +44,7 @@ if (!product.name || !product.brand || !product.category || !product.price
 }
 
 try {
-    const response = await fetch("http://localhost:4000/products", {
+    const response = await fetch("http://localhost:4000/products/", + params.id, {
         method: "PATCH",
        body: formData
     })
@@ -43,7 +62,7 @@ try {
         
     }
     else {
-        alert("Unable to create the product!")
+        alert("Unable to update the product!")
     }
 }
 catch (error) {
@@ -63,24 +82,26 @@ ID
 </label>
 <div className="col-sm-8">
 <input readOnly className="form-control-plaintext" defaultValue={params.id} />
-
-
 </div>
 
+
+{
+
+    initialData &&
 <form onSubmit={handleSubmit}>
 <div className="row mb-3">
 <label className="col-sm-4 col-form-label">
 Name
 </label>
 <div className="col-sm-8">
-<input className="form-control" name="name"/>
+<input className="form-control" name="name" defaultValue={initialData.name}/>
 <span className="text-danger">{validationErrors.name}</span>
 
 </div>
 </div>
 
 <div className="row mb-3">
-<label className="col-sm-4 col-form-label">Brand</label>
+<label className="col-sm-4 col-form-label" defaultValue={initialData.brand}>Brand</label>
 <div className="col-sm-8">
 <input className="form-control" name="brand"/>
 <span className="text-danger">{validationErrors.brand}</span>
@@ -89,7 +110,7 @@ Name
 </div>
 
 <div className="row mb-3">
-                            <label className="col-sm-4 col-form-label">Category</label>
+                            <label className="col-sm-4 col-form-label" defaultValue={initialData.category}>Category</label>
                             <div className="col-sm-8">
                                 <select className="form-select" name="category">
                                     <option value='Other'>Other</option>
@@ -104,7 +125,7 @@ Name
                         </div>
 
                         <div className="row mb-3">
-                            <label className="col-sm-4 col-form-label">Price</label>
+                            <label className="col-sm-4 col-form-label" defaultValue={initialData.price}>Price</label>
                             <div className="col-sm-8">
                                 <input className="form-control" name="price" type="number" step="0.01" min="1" />
                                 <span className="text-danger">{validationErrors.price}</span>
@@ -112,7 +133,7 @@ Name
                         </div>
 
                         <div className="row mb-3">
-                            <label className="col-sm-4 col-form-label">Description</label>
+                            <label className="col-sm-4 col-form-label" defaultValue={initialData.description}>Description</label>
                             <div className="col-sm-8">
                                 <textarea className="form-control" name="description" rows="4" />
                                 <span className="text-danger">{validationErrors.description}</span>
@@ -122,7 +143,7 @@ Name
                         <div className="row mb-3">
                             
                             <div className="offset-sm-4 col-sm-8">
-                                <img src={"http://localhost:4000/images/" + "22866337.jpg"}
+                                <img src={"http://localhost:4000/images/" + initialData.imageFilename}
                                     width="150" alt="..."
                                 />
                                 
@@ -140,7 +161,7 @@ Name
                         <div className="row mb-3">
                             <label className="col-sm-4 col-form-label">Created At</label>
                             <div className="col-sm-8">
-                                <input readOnly className="form-control-plaintext" defaultValue={"2024-07-10"}  />
+                                <input readOnly className="form-control-plaintext" defaultValue={initialData.createdAt.slice(0, 10) }  />
                                 
                             </div>
                         </div>
@@ -156,6 +177,7 @@ Name
 
 </form>
 
+}
                 </div>
 </div>
 
